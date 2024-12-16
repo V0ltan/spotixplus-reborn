@@ -1,5 +1,12 @@
 # SpotiX+ Windows
 
-SpotiX+ est un mod Spotify qui retire les pubs, skip infini, qualité du son meilleur !
+Qu'est-ce que SpotiX+ ? 
+Il s'agit d'une version modifiée de Spotify, vous permettant de ne plus avoir de pub, passer les titres à l'infini, et bien plus encore !
 
-Site: https://spotixplus.com
+Toutes les fonctionnalitées sont disponible sur le site:
+https://spotixplus.fr
+
+
+CETTE PAGE GITHUB SERT A PARTAGER LE CODE SOURCE DU SCRIPT
+
+By Voltan
