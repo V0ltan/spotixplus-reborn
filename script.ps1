@@ -1,42 +1,4 @@
-﻿##[Ps1 To Exe]
-##
-##NcDBCIWOCzWE8pSP3xB45l7jR2Y/ffmoqbmzzbn8zOn+sjXNCawRW0d+mSfAN1uyTfsqHrUmt8MYRQlqOaE30aLfD+6vXJ0dm+0uO6jf9/wsDV+4
-##NcDBCIWOCzWE8pSP3xB45l7jR2Y/ffmoqbmzzbn8zOn+sjXNCawRW0d+mSfAN1uyTfsqHrUmt8MYRQlqOaE30aLfD+6vXIQfnu8oJr3D/vx4W1/A5vM=
-##NcDBCIWOCzWE8pSP3xB45l7jR2Y/ffmoqbmzzbn8zOn+sjXNCawRW0d+mSfAN1uyTfsqHrUmt8MYRQlqOaE38LfRH+qsC7YShoM=
-##NcDBCIWOCzWE8pSP3xB45l7jR2Y/ffmoqbmzzbn8zOn+sjXNCawRW0d+mSfAN1uyTfsqHrUmt8MYRQlqOaE37r3XFKm5S6Vq
-##NcDBCIWOCzWE8pSP3xB45l7jR2Y/ffmoqbmzzbn8zOn+sjXNCawRW0d+mSfAN1uyTfsqHrUmt8MYRQlqOaE39rfID6m9XbZq
-##Kd3HDZOFADWE8uO1
-##Nc3NCtDXTlODjpba9Dp76krqfmQkacrb8efuioi/8Io=
-##Kd3HFJGZHWLWoLaVvnQnhQ==
-##LM/RF4eFHHGZ7/LG8ztj7FP+Tn04IMaUtNY=
-##K8rLFtDXTiS5
-##OsHQCZGeTiiZ4NI=
-##OcrLFtDXTiS5
-##LM/BD5WYTiiZ4tI=
-##McvWDJ+OTiiZ4tI=
-##OMvOC56PFnzN8u+Vs1Q=
-##M9jHFoeYB2Hc8u+Vs1Q=
-##PdrWFpmIG2HcofKIo2QX
-##OMfRFJyLFzWE8uK1
-##KsfMAp/KUzWI0g==
-##OsfOAYaPHGbQvbyVvnQkqxugEiZ7Dg==
-##LNzNAIWJGmPcoKHc7Do3uAu9DDhL
-##LNzNAIWJGnvYv7eVvnRE9UT6S1BgDg==
-##M9zLA5mED3nfu77Q7TV64AuzAns7YdGSoaar0ZLy+fiM
-##NcDWAYKED3nfu77Q7TV64AuzAls7YdGSgf3H
-##OMvRB4KDHmHQvbyVvnRb5F7gQWBrXdWUrb+fj8G18fn4uinVTIh0
-##P8HPFJGEFzWE8oHF7CB+3QvNTXo7Dg==
-##KNzDAJWHD2fS8u+Vgw==
-##P8HSHYKDCX3N8u+Vgw==
-##LNzLEpGeC3fMu77Ro2k3hQ==
-##L97HB5mLAnfMu77Ro2k38xigEgg=
-##P8HPCZWEGmaZ7/L3+nRB6kf6Q2ZL
-##L8/UAdDXTlaDjofG5iZk2X3hTnwqYPm/vKWs0I6sw8btrivaQdonSkZ+hj28N1uyTfsqHrUD559BGxgyKpI=
-##Kc/BRM3KXhU=
-##
-##
-##fd6a9f26a06ea3bc99616d4851b372ba
-$ErrorActionPreference = "Continue"
+﻿$ErrorActionPreference = "Continue"
 $Host.UI.RawUI.WindowTitle = "SpotiX+ PC Script v3.0 - Chargement"
 #générer un nom de fichier de log unique basé sur la date et l'heure
 $date = Get-Date -Format "yyyyMMdd_HHmmss"
