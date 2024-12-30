@@ -29,7 +29,7 @@ Set-ExecutionPolicy -Scope CurrentUser ByPass -Force
 ```
 Vous devriez maintenant être capable de lancer le script !
 
-------
+---
 
 Lors de l'execution du script, ce message peut apparaître à plusieures reprises :
 ```
