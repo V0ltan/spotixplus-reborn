@@ -19,6 +19,10 @@ Si vous avez le message suivant qui apparait :
 ```
 File <chemin>\script.ps1 cannot be loaded because running scripts is disabled on this system
 ```
+OU
+```
+The file <chemin>\script.ps1 is not digitally signed.
+```
 Ouvrez PowerShell, entrez la commande suivante :
 ```
 Set-ExecutionPolicy -Scope CurrentUser ByPass -Force
