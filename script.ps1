@@ -23,7 +23,7 @@ $logo = "
    -----------------------------------------------
 "
 
-$github = ""
+$github = "https://github.com/AgoyaSpotix/spotixplus-reborn-windows"
 
 # Paramètre PowerShell
 $ErrorActionPreference = "Continue"
@@ -43,12 +43,6 @@ function SetTitle {
 		[string] $Name
 	)
 	$Host.UI.RawUI.WindowTitle = "$AppName v$Version - $Name"
-}
-
-function PrintLogo {
-	[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
-	Write-Host $Logo -ForegroundColor Green
-	Write-Host ""
 }
 
 function StopSpotify {
@@ -83,14 +77,14 @@ $powershellPath = "C:\Program Files\PowerShell\7\pwsh.exe"
 # PowerShell 7 pas trouvé => demande à l'utilisateur de l'installer
 if (-Not (Test-Path $powershellPath)) {
 	SetTitle "Erreur"
-	[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
+	Clear-Host
 	Write-Host "PowerShell 7 n'est pas installé sur ce système." -ForegroundColor Red
 	$confirmation = Read-Host -Prompt "Souhaitez-vous installer PowerShell 7 ? (Y/N)"
 
 	if ($confirmation -eq "Y") {
 		# Installation de PowerShell 7
 		SetTitle "PowerShell 7.3.3"
-		[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
+		Clear-Host
 		Write-Host "Lancement du téléchargement de PowerShell 7.3.3..." -ForegroundColor Green
 
 		$url = "https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/PowerShell-7.3.3-win-x64.msi"
@@ -114,7 +108,7 @@ if (-Not (Test-Path $powershellPath)) {
 			exit
 		}
 	} else {
-		[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
+		Clear-Host
 		Write-Host "Vous pouvez fermer cette fenêtre en appuyant sur Entrée." -ForegroundColor Yellow -NoNewLine
 		EnterToContinue -DefaultPrompt $true
 		Stop-Transcript
@@ -151,6 +145,12 @@ if (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]:
 	Write-Host "Veuillez redémarrer le script normalement." -ForegroundColor Red
 	EnterToContinue -DefaultPrompt $true
 	exit 1
+}
+
+function PrintLogo {
+	[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
+	Write-Host $Logo -ForegroundColor Green
+	Write-Host ""
 }
 
 function GetUserChoices {
@@ -221,7 +221,7 @@ function Main {
 					# Installation de Spotify
 					SetTitle "Installation"
 					PrintLogo
-					
+
 					Write-Host "Téléchargement et installation de Spotify.."
 
 					$webClient = New-Object System.Net.WebClient
@@ -267,50 +267,8 @@ function Main {
 					# Arrêt du processus Spotify
 					StopSpotify
 
-					# Traductions francaises
-					Write-Host "Configuration de $AppNameShort"
-					<#$url0 = "https://spotixplus.fr/files/windows/script/frdesactived.mo"
-					$fichierLocal0 = "$env:UserProfile\AppData\Roaming\Spotify\locales\frdesactived.mo"
-					$webClient = New-Object System.Net.WebClient
-					$bufferSize = 8192  # 8KB
-					$startTime = Get-Date
-					$totalBytesReceived = 0
-
-					$responseStream = $webClient.OpenRead($url0)
-					$fileStream = [System.IO.File]::Create($fichierLocal0)
-					$buffer = New-Object byte[] $bufferSize
-					$totalBytes = $webClient.ResponseHeaders["Content-Length"]
-					$bytesReceived = 0
-
-					while (($readBytes = $responseStream.Read($buffer, 0, $bufferSize)) -gt 0) {
-						$fileStream.Write($buffer, 0, $readBytes)
-						$totalBytesReceived += $readBytes
-						$timeElapsed = (Get-Date) - $startTime
-						$speed = $totalBytesReceived / $timeElapsed.TotalSeconds / 1MB
-						$percentComplete = ($totalBytesReceived / $totalBytes) * 100
-						[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
-						Write-Progress -Activity "Téléchargement en cours" -Status "$([math]::Round($percentComplete, 2))% complet" -PercentComplete $percentComplete
-					}
-
-					$responseStream.Close()
-					$fileStream.Close()
-
-					if (Test-Path $fichierLocal0) {
-						$asupp = "$env:UserProfile\AppData\Roaming\Spotify\locales\fr.mo"
-						Remove-Item -Path $asupp
-						$oldFile1 = "$env:UserProfile\AppData\Roaming\Spotify\locales\frdesactived.mo"
-						$newFile1 = "$env:UserProfile\AppData\Roaming\Spotify\locales\fr.mo"
-						Rename-Item -Path $oldFile1 -NewName $newFile1
-					} else {
-						SetTitle "Erreur"
-						Write-Host "Une erreur s'est produite durant le téléchargement des fichiers nécessaires." -ForegroundColor Red
-						Write-Host "Ne retentez pas de lancer le script, cela pourrait générer des conflits" -ForegroundColor Red
-						Write-Host "Merci de contacter le support de $AppNameShort" -ForegroundColor Red
-						EnterToContinue
-						exit
-					}#>
-
 					# Conditions
+					Write-Host "Configuration de $AppNameShort"
 					$pathconfig = "$env:UserProfile\AppData\Roaming\Spotify\"
 					New-Item -Path $pathconfig -Name "config.need" -ItemType "File" -Force
 
@@ -390,7 +348,7 @@ function Main {
 					} else {
 						Write-Host "Suppresion de la qualité très élévée"
 					}
-					
+
 					$audioveryhigh = (
 						"audio.sync_bitrate=320000",
 						"audio.play_bitrate=320000"
@@ -421,55 +379,6 @@ function Main {
 						}
 					}
 
-					<#if ($confirmation -eq "1") {
-						$filename = "fractived.mo"
-					} else {
-						$filename = "frdesactived.mo"
-					}
-					
-					$url0 = "https://spotixplus.fr/files/windows/script/$filename"
-					$fichierLocal0 = "$env:UserProfile\AppData\Roaming\Spotify\locales\$filename"
-					$webClient = New-Object System.Net.WebClient
-					$bufferSize = 8192  # 8KB
-					$startTime = Get-Date
-					$totalBytesReceived = 0
-
-					$responseStream = $webClient.OpenRead($url0)
-					$fileStream = [System.IO.File]::Create($fichierLocal0)
-					$buffer = New-Object byte[] $bufferSize
-					$totalBytes = $webClient.ResponseHeaders["Content-Length"]
-					$bytesReceived = 0
-
-					while (($readBytes = $responseStream.Read($buffer, 0, $bufferSize)) -gt 0) {
-						$fileStream.Write($buffer, 0, $readBytes)
-						$totalBytesReceived += $readBytes
-						$timeElapsed = (Get-Date) - $startTime
-						$speed = $totalBytesReceived / $timeElapsed.TotalSeconds / 1MB
-						$percentComplete = ($totalBytesReceived / $totalBytes) * 100
-						[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
-						Write-Progress -Activity "Téléchargement en cours" -Status "$([math]::Round($percentComplete, 2))% complet" -PercentComplete $percentComplete
-					}
-
-					$responseStream.Close()
-					$fileStream.Close()
-
-					if (Test-Path $fichierLocal0) {
-						$asupp = "$env:UserProfile\AppData\Roaming\Spotify\locales\fr.mo"
-						Remove-Item -Path $asupp
-						$oldFile1 = "$env:UserProfile\AppData\Roaming\Spotify\locales\$filename"
-						$newFile1 = "$env:UserProfile\AppData\Roaming\Spotify\locales\fr.mo"
-						Rename-Item -Path $oldFile1 -NewName $newFile1
-					} else {
-						SetTitle "Erreur"
-						Write-Host "Une erreur s'est produite durant le téléchargement des fichiers nécessaires." -ForegroundColor Red
-						Write-Host "Ne retentez pas de lancer le script, cela pourrait générer des conflits" -ForegroundColor Red
-						Write-Host "Merci de contacter le support de $AppNameShort" -ForegroundColor Red
-						EnterToContinue
-						Write-Host "Fermeture de la fenêtre.."
-						Stop-Transcript
-						exit
-					}#>
-					
 					if ($confirmation -eq "1") {
 					Write-Host "La qualité très élevée est appliquée !"
 					} else {

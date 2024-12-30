@@ -1,7 +1,6 @@
 # SpotiX+ Reborn Windows
 
-![logo_horizontal](https://github.com/user-attachments/assets/70ccf141-6138-4c53-a500-6d11ac9ff241)
-
+![logo_horizontal](https://raw.githubusercontent.com/AgoyaSpotix/spotixplus-reborn-windows/refs/heads/main/logo/logo_horizontal.png)
 
 ### Qu'est-ce que SpotiX+ Reborn ?
 Il s'agit d'une version modifiée de Spotify, vous permettant de ne plus avoir de pub, passer les titres à l'infini, et bien plus encore !
@@ -22,7 +21,7 @@ File <chemin>\script.ps1 cannot be loaded because running scripts is disabled on
 ```
 Ouvrez PowerShell, entrez la commande suivante :
 ```
-Set-ExecutionPolicy ByPass -Force
+Set-ExecutionPolicy -Scope CurrentUser ByPass -Force
 ```
 Vous devriez maintenant être capable de lancer le script !
 
