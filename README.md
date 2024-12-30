@@ -17,7 +17,7 @@ Si il n'est pas présent sur votre machine, vous pourrez le lancer avec PowerShe
 ### Bugs connus
 Si vous avez le message suivant qui apparait :
 ```
-File <chemin>\script.ps1 cannot be loaded because running scripts is disabled on this system
+The file <chemin>\script.ps1 cannot be loaded because running scripts is disabled on this system
 ```
 OU
 ```
