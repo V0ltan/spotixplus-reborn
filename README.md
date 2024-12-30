@@ -41,7 +41,7 @@ Line |
      | current window size fits within the console's buffer, and the numbers must not be negative. (Parameter 'top')
      | Actual value was 1."
 ```
-L'apparition de ce bug est connu et normal, il n'affecte pas le bon fonctionnement du script. Il sera patché dans une prochaine mise à jour.
+L'apparition de ce bug est connue et normale, ce dernier n'affecte pas le bon fonctionnement du script. Il sera patché dans une prochaine mise à jour.
 
 ## J'ai d'autres bugs !
 Regardez si quelqu'un n'a pas déjà reporté le bug dans l'onglet [Issues](https://github.com/DelofJ/spotixplus-windows/issues) ou sur le Discord.\
