@@ -1,7 +1,7 @@
 ﻿# Constantes
 $AppNameShort = "SpotiX+ Reborn"
 $AppName = "$AppNameShort PC Script"
-$Version = "1.0"
+$Version = "1.1"
 
 # Logo fait avec https://patorjk.com/software/taag/
 $logo = "
