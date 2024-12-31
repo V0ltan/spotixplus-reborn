@@ -2,7 +2,7 @@
 $AppNameShort = "SpotiX+ Reborn"
 $AppName = "$AppNameShort PC Script"
 $Version = "1.1"
-$ByPassAdmin = $true
+$ByPassAdmin = $false
 $Github = "https://github.com/AgoyaSpotix/spotixplus-reborn-windows"
 
 # Logo fait avec https://patorjk.com/software/taag/
@@ -49,6 +49,15 @@ function StopSpotify {
 	$spotify = Get-Process -Name spotify -ErrorAction SilentlyContinue
 	if ($spotify) {
 		Stop-Process $spotify
+	}
+}
+
+function RemoveIfExists {
+	param (
+		[string] $Path
+	)
+	if (Test-Path -Path $Path) {
+		Remove-Item $Path -Recurse
 	}
 }
 
@@ -248,8 +257,8 @@ function Main {
 
 					# Dossier Spicetify
 					Write-Host "Création des dossiers nécessaires"
-					if (-not (Test-Path -Path "$env:UserProfile\AppData\Roaming\spicetify\")) {
-						New-Item -Path "$env:UserProfile\AppData\Roaming\spicetify\" -ItemType Directory
+					if (-not (Test-Path -Path "$env:AppData\spicetify\")) {
+						New-Item -Path "$env:AppData\spicetify\" -ItemType Directory
 					}
 
 					# Spicetify
@@ -273,7 +282,7 @@ function Main {
 
 					# Conditions
 					Write-Host "Configuration de $AppNameShort"
-					$pathconfig = "$env:UserProfile\AppData\Roaming\Spotify\"
+					$pathconfig = "$env:AppData\Spotify\"
 					New-Item -Path $pathconfig -Name "config.need" -ItemType "File" -Force
 
 					# Plugins
@@ -335,111 +344,117 @@ function Main {
 			"2" {
 				# Qualité audio
 				SetTitle "Configuration Audio"
-				$pathconfig = "$env:UserProfile\Desktop\"
-				if (Test-Path -Path "$pathconfig\$AppNameShort.lnk") {
-					# Fichier trouvé
-					Write-Host "ATTENTION: ne démarrez pas $AppNameShort pendant ce processus, cela pourrait engendrer des conflits" -ForegroundColor Red
-					$confirmation = Read-Host -Prompt ((
-						"Quelle qualité audio souhaitez-vous ?",
-						"Qualité très élevée (1)",
-						"Qualité basique (réglable depuis $AppNameShort) (2)",
-						"(1/2)"
-					) -join "`n")
+				PrintLogo
 
-					StopSpotify
-					if ($confirmation -eq "1") {
-						Write-Host "Configuration de la qualité très élevée"
-					} else {
-						Write-Host "Suppresion de la qualité très élévée"
-					}
-
-					$audioveryhigh = (
-						"audio.sync_bitrate=320000",
-						"audio.play_bitrate=320000"
-					) -join "`n"
-
-					$prefs = "$env:UserProfile\AppData\Roaming\Spotify\prefs"
-					if (Test-Path -Path $prefs) {
-						if ($confirmation -eq "1") {
-							Add-Content -Path $prefs -Value $audioveryhigh
-							Set-ItemProperty -Path $prefs -Name IsReadOnly -Value $true
-						} else {
-							Set-ItemProperty -Path $prefs -Name IsReadOnly -Value $false
-							$content = Get-Content -Path $prefs
-							$newContent = $content | Where-Object { $_ -notmatch "audio.sync_bitrate=320000" -and $_ -notmatch "audio.play_bitrate=320000" }
-							Set-Content -Path $prefs -Value $newContent
-						}
-					}
-					$tmp = "$env:UserProfile\AppData\Roaming\Spotify\prefs.tmp"
-					if (Test-Path -Path $tmp) {
-						if ($confirmation -eq "1") {
-							Add-Content -Path $tmp -Value $audioveryhigh
-							Set-ItemProperty -Path $tmp -Name IsReadOnly -Value $true
-						} else {
-							Set-ItemProperty -Path $tmp -Name IsReadOnly -Value $false
-							$content = Get-Content -Path $tmp
-							$newContent = $content | Where-Object { $_ -notmatch "audio.sync_bitrate=320000" -and $_ -notmatch "audio.play_bitrate=320000" }
-							Set-Content -Path $tmp -Value $newContent
-						}
-					}
-
-					if ($confirmation -eq "1") {
-					Write-Host "La qualité très élevée est appliquée !"
-					} else {
-						Write-Host "La qualité très élevée a été supprimée avec succès !"
-					}
-					EnterToContinue -DefaultPrompt $true
-					Stop-Transcript
-					exit
-				} else {
+				if (-not (Test-Path -Path "$env:AppData\Spotify")) {
+					SetTitle "Erreur"
 					Write-Host "$AppNameShort n'est pas installé sur votre PC, merci de l'installer d'abord."
 					EnterToContinue -DefaultPrompt $true
 					Stop-Transcript
 					exit
 				}
+
+				# Fichier trouvé
+				Write-Host "ATTENTION: ne démarrez pas $AppNameShort pendant ce processus, cela pourrait engendrer des conflits" -ForegroundColor Red
+				Write-Host ((
+					"Quelle qualité audio souhaitez-vous ?",
+					"1. Qualité très élevée",
+					"2. Qualité basique (réglable depuis $AppNameShort)"
+				) -join "`n`t")
+				$confirmation = GetUserChoices -validResponses @("1", "2")
+				PrintLogo
+				SetTitle "Configuration Audio"
+
+				StopSpotify
+				if ($confirmation -eq "1") {
+					Write-Host "Configuration de la qualité très élevée"
+				} else {
+					Write-Host "Suppresion de la qualité très élévée"
+				}
+
+				$audioveryhigh = (
+					"audio.sync_bitrate=320000",
+					"audio.play_bitrate=320000"
+				) -join "`n"
+
+				$prefs = "$env:AppData\Spotify\prefs"
+				if (Test-Path -Path $prefs) {
+					if ($confirmation -eq "1") {
+						Add-Content -Path $prefs -Value $audioveryhigh
+						Set-ItemProperty -Path $prefs -Name IsReadOnly -Value $true
+					} else {
+						Set-ItemProperty -Path $prefs -Name IsReadOnly -Value $false
+						$content = Get-Content -Path $prefs
+						$newContent = $content | Where-Object { $_ -notmatch "audio.sync_bitrate=320000" -and $_ -notmatch "audio.play_bitrate=320000" }
+						Set-Content -Path $prefs -Value $newContent
+					}
+				}
+				$tmp = "$env:AppData\Spotify\prefs.tmp"
+				if (Test-Path -Path $tmp) {
+					if ($confirmation -eq "1") {
+						Add-Content -Path $tmp -Value $audioveryhigh
+						Set-ItemProperty -Path $tmp -Name IsReadOnly -Value $true
+					} else {
+						Set-ItemProperty -Path $tmp -Name IsReadOnly -Value $false
+						$content = Get-Content -Path $tmp
+						$newContent = $content | Where-Object { $_ -notmatch "audio.sync_bitrate=320000" -and $_ -notmatch "audio.play_bitrate=320000" }
+						Set-Content -Path $tmp -Value $newContent
+					}
+				}
+
+				if ($confirmation -eq "1") {
+					Write-Host "La qualité très élevée est appliquée !"
+				} else {
+					Write-Host "La qualité très élevée a été supprimée avec succès !"
+				}
+				EnterToContinue -DefaultPrompt $true
+				Stop-Transcript
+				exit
 			}
 			"3" {
+				PrintLogo
 				# Désinstallation
-				$pathconfig = "$env:UserProfile\Desktop\"
-				if (Test-Path -Path "$pathconfig\$AppNameShort.lnk") {
-					$confirmation = Read-Host -Prompt "Êtes vous sûr de vouloir désinstaller $AppNameShort et tout ses composants ? (Y/N)"
-					if ($confirmation -eq "Y") {
-						SetTitle "Désinstallation"
-						StopSpotify
-						Write-Host "Désinstallation de $AppNameShort.."
 
-						# Suppression des dossiers/fichiers
-						Write-Host "Suppresion de Spicetify.."
-						Remove-Item $env:UserProfile\AppData\Roaming\spicetify\ -Recurse
-						Write-Host "Suppresion de Spotify.."
-						$prefs = "$env:UserProfile\AppData\Roaming\Spotify\prefs"
-						if (Test-Path -Path $prefs) {
-							Set-ItemProperty -Path $prefs -Name IsReadOnly -Value $false
-						}
-						$tmp = "$env:UserProfile\AppData\Roaming\Spotify\prefs.tmp"
-						if (Test-Path -Path $tmp) {
-							Set-ItemProperty -Path $tmp -Name IsReadOnly -Value $false
-						}
-						Remove-Item $env:UserProfile\AppData\Roaming\Spotify\ -Recurse
-						Remove-Item $env:UserProfile\AppData\Local\Spotify\ -Recurse
-						Remove-Item $env:UserProfile\Desktop\$AppNameShort.lnk -Recurse
+				if (-not (Test-Path -Path "$env:AppData\Spotify")) {
+					SetTitle "Erreur"
+					Write-Host "Vous ne pouvez pas déinstaller $AppNameShort car celui-ci n'est pas installé."
+					EnterToContinue -DefaultPrompt $true
+					Stop-Transcript
+					exit
+				}
 
-						PrintLogo
-						Write-Host "$AppNameShort désinstallé avec succès !"
-						EnterToContinue -DefaultPrompt $true
-						Stop-Transcript
-						exit
-					} else {
-						Write-Host "Annulation.."
-						EnterToContinue -DefaultPrompt $true
-						Stop-Transcript
-						exit
+				$confirmation = Read-Host -Prompt "Êtes vous sûr de vouloir désinstaller $AppNameShort et tout ses composants ? (Y/N)"
+				PrintLogo
+				if ($confirmation -eq "Y") {
+					SetTitle "Désinstallation"
+					StopSpotify
+					Write-Host "Désinstallation de $AppNameShort.."
+
+					# Suppression des dossiers/fichiers
+					Write-Host "Suppresion de Spicetify.."
+					RemoveIfExists "$env:AppData\spicetify"
+
+					Write-Host "Suppresion de Spotify.."
+
+					$prefs = "$env:AppData\Spotify\prefs"
+					if (Test-Path -Path $prefs) {
+						Set-ItemProperty -Path $prefs -Name IsReadOnly -Value $false
 					}
+					$tmp = "$env:AppData\Spotify\prefs.tmp"
+					if (Test-Path -Path $tmp) {
+						Set-ItemProperty -Path $tmp -Name IsReadOnly -Value $false
+					}
+
+					RemoveIfExists "$env:AppData\Spotify"
+					RemoveIfExists "$env:LocalAppData\Spotify"
+					RemoveIfExists "$env:UserProfile\Desktop\$AppNameShort.lnk"
+
+					Write-Host "$AppNameShort désinstallé avec succès !"
 					EnterToContinue -DefaultPrompt $true
 					Stop-Transcript
 					exit
 				} else {
-					Write-Host "Vous ne pouvez pas déinstaller $AppNameShort car celui-ci n'est pas installé."
+					Write-Host "Annulation.."
 					EnterToContinue -DefaultPrompt $true
 					Stop-Transcript
 					exit
