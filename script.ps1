@@ -2,19 +2,21 @@
 $AppNameShort = "SpotiX+ Reborn"
 $AppName = "$AppNameShort PC Script"
 $Version = "1.1"
+$ByPassAdmin = $true
+$Github = "https://github.com/AgoyaSpotix/spotixplus-reborn-windows"
 
 # Logo fait avec https://patorjk.com/software/taag/
-$logo = "
-  ____                    _     _  __  __        
- / ___|   _ __     ___   | |_  (_) \ \/ /    _   
- \___ \  | '_ \   / _ \  | __| | |  \  /   _| |_ 
-  ___) | | |_) | | (_) | | |_  | |  /  \  |_   _|
- |____/  | .__/   \___/   \__| |_| /_/\_\   |_|  
-         |_|  ____      _                       
-             |  _ \ ___| |__   ___  _ __ _ __    
-             | |_) / _ \ '_ \ / _ \| '__| '_ \   
-             |  _ <  __/ |_) | (_) | |  | | | |  
-             |_| \_\___|_.__/ \___/|_|  |_| |_|  
+$Logo = "
+       ____                    _     _  __  __        
+      / ___|   _ __     ___   | |_  (_) \ \/ /    _   
+      \___ \  | '_ \   / _ \  | __| | |  \  /   _| |_ 
+       ___) | | |_) | | (_) | | |_  | |  /  \  |_   _|
+      |____/  | .__/   \___/   \__| |_| /_/\_\   |_|  
+              |_|  ____      _                       
+                  |  _ \ ___| |__   ___  _ __ _ __    
+                  | |_) / _ \ '_ \ / _ \| '__| '_ \   
+                  |  _ <  __/ |_) | (_) | |  | | | |  
+                  |_| \_\___|_.__/ \___/|_|  |_| |_|  
 
        ----------------------------------------------
       /     Merci d'avoir téléchargé le script      /
@@ -22,8 +24,6 @@ $logo = "
     /                Version $Version                  /
    -----------------------------------------------
 "
-
-$github = "https://github.com/AgoyaSpotix/spotixplus-reborn-windows"
 
 # Paramètre PowerShell
 $ErrorActionPreference = "Continue"
@@ -72,10 +72,11 @@ if (-not (Test-Path -Path "$PSScriptRoot\SpotiX-Logs")) {
 Start-Transcript -Path $log_file_dir
 
 # Vérifie si PowerShell 7 est installé
-$powershellPath = "C:\Program Files\PowerShell\7\pwsh.exe"
+$powershellPath        = "C:\Program Files\PowerShell\7\pwsh.exe"
+$powershellPreviewPath = "C:\Program Files\PowerShell\7-preview\pwsh.exe"
 
 # PowerShell 7 pas trouvé => demande à l'utilisateur de l'installer
-if (-Not (Test-Path $powershellPath)) {
+if (($PSVersionTable.PSVersion.Major -lt 7) -and (-Not ((Test-Path $powershellPath) -or (Test-Path $powershellPreviewPath)))) {
 	SetTitle "Erreur"
 	Clear-Host
 	Write-Host "PowerShell 7 n'est pas installé sur ce système." -ForegroundColor Red
@@ -133,14 +134,17 @@ if ($args -notcontains "-FromLauncher") {
 			$scriptPath = $newScriptPath
 		}
 
-		Start-Process $powershellPath -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`" -FromLauncher"
+		if (Test-Path $powershellPath) {
+			Start-Process $powershellPath -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`" -FromLauncher"
+		} else {
+			Start-Process $powershellPreviewPath -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`" -FromLauncher"
+		}
 		exit
 	}
 }
 
 # Verification admin ou pas
-# TODO : Remove $false
-if (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+if ((-not $ByPassAdmin) -and ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
 	Write-Host "Pour pouvoir faire fonctionner correctement le script, celui ci ne dois pas être lancer en administrateur." -ForegroundColor Red
 	Write-Host "Veuillez redémarrer le script normalement." -ForegroundColor Red
 	EnterToContinue -DefaultPrompt $true
@@ -148,7 +152,7 @@ if (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]:
 }
 
 function PrintLogo {
-	[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
+	Clear-Host
 	Write-Host $Logo -ForegroundColor Green
 	Write-Host ""
 }
@@ -234,7 +238,7 @@ function Main {
 					# SpotX
 					Write-Host "Téléchargement/Installation de SpotX CLI.."
 					SetTitle "SpotX Configuration"
-					[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
+					Clear-Host
 					[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iex "& { $((iwr -useb 'https://raw.githubusercontent.com/SpotX-Official/SpotX/main/run.ps1').Content) }"
 					Write-Host "Script 1/2 installés : SpotiX installé"
 
@@ -250,7 +254,7 @@ function Main {
 
 					# Spicetify
 					SetTitle "Spicetify Configuration"
-					[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
+					Clear-Host
 					[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iex "& { $((iwr -useb 'https://raw.githubusercontent.com/spicetify/spicetify-cli/master/install.ps1').Content) }"
 					Write-Host "Script 2/2 installés : Spicetify"
 
@@ -443,7 +447,7 @@ function Main {
 			}
 			"4" {
 				Write-Host "Ouverture de la page GitHub.."
-				Start-Process $github
+				Start-Process $Github
 				Main
 			}
 			"5" {
