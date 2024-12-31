@@ -15,11 +15,10 @@ Il vous faudra PowerShell 7 pour lancer ce script.\
 Si il n'est pas présent sur votre machine, vous pourrez le lancer avec PowerShell 5 (installé de base sur Windows) et le script vous fera automatiquement installer PowerShell 7.
 
 ## Bugs connus
-Si vous avez le message suivant qui apparait :
+Si vous un des messages suivants qui apparaissent :
 ```
 The file <chemin>\script.ps1 cannot be loaded because running scripts is disabled on this system
 ```
-OU
 ```
 The file <chemin>\script.ps1 is not digitally signed.
 ```
@@ -29,21 +28,7 @@ Set-ExecutionPolicy -Scope CurrentUser ByPass -Force
 ```
 Vous devriez maintenant être capable de lancer le script !
 
----
-
-Lors de l'execution du script, ce message peut apparaître à plusieures reprises :
-```
-MethodInvocationException: <chemin>\script.ps1:49
-Line |
-  49 |      [System.Console]::SetWindowPosition(0,[System.Console]::CursorTop …
-     |      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     | Exception calling "SetWindowPosition" with "2" argument(s): "The window position must be set such that the
-     | current window size fits within the console's buffer, and the numbers must not be negative. (Parameter 'top')
-     | Actual value was 1."
-```
-L'apparition de ce bug est connue et normale, ce dernier n'affecte pas le bon fonctionnement du script. Il sera patché dans une prochaine mise à jour.
-
 ## J'ai d'autres bugs !
-Regardez si quelqu'un n'a pas déjà reporté le bug dans l'onglet [Issues](https://github.com/DelofJ/spotixplus-windows/issues) ou sur le Discord.\
-Si c'est le cas, envoyer une réponse en disant que cela vous arrive aussi.\
+Regardez si quelqu'un n'a pas déjà reporté le bug dans l'onglet [Issues](https://github.com/DelofJ/spotixplus-windows/issues).\
+Si c'est le cas, envoyez une réponse en disant que cela vous arrive aussi.\
 Sinon, signalez-le de vous même.

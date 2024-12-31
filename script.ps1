@@ -1,7 +1,7 @@
 ﻿# Constantes
 $AppNameShort = "SpotiX+ Reborn"
 $AppName = "$AppNameShort PC Script"
-$Version = "1.1"
+$Version = "1.2"
 $ByPassAdmin = $false
 $Github = "https://github.com/AgoyaSpotix/spotixplus-reborn-windows"
 
