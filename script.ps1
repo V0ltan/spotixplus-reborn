@@ -509,7 +509,7 @@ function CheckUpdate {
 	Write-Host "Mise à jour téléchargée"
 	Write-Host "Appuyez sur Entrée pour relancer la version mise à jour..."
 	EnterToContinue
-	Start-Process $powershellPath -ArgumentList "-ExecutionPolicy Bypass -File `"$PSCommandPath`" -FromLauncher"
+	Start-Process "$PSHOME\pwsh.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$PSCommandPath`" -FromLauncher"
 	exit
 }
 
