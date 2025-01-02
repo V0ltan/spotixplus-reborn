@@ -1,9 +1,12 @@
 ﻿# Constantes
 $AppNameShort = "SpotiX+ Reborn"
 $AppName = "$AppNameShort PC Script"
-$Version = "1.2"
+$Version = "1.3"
 $ByPassAdmin = $false
-$Github = "https://github.com/AgoyaSpotix/spotixplus-reborn-windows"
+
+$GithubUser = "AgoyaSpotix"
+$GithubRepo = "spotixplus-reborn-windows"
+$Discord = "https://discord.gg/p3AAf7TUPv"
 
 # Logo fait avec https://patorjk.com/software/taag/
 $Logo = "
@@ -81,75 +84,87 @@ if (-not (Test-Path -Path "$PSScriptRoot\SpotiX-Logs")) {
 Start-Transcript -Path $log_file_dir
 
 # Vérifie si PowerShell 7 est installé
-$powershellPath        = "C:\Program Files\PowerShell\7\pwsh.exe"
-$powershellPreviewPath = "C:\Program Files\PowerShell\7-preview\pwsh.exe"
+# PowerShell 7 pas installé => demande à l'utilisateur de l'installer
+# PowerShell 7 est installé => exécute le script avec PowerShell 7
+function GetPowershellPath {
+	$powershellRetailPath  = "$env:ProgramFiles\PowerShell\7\pwsh.exe"
+	$powershellPreviewPath = "$env:ProgramFiles\PowerShell\7-preview\pwsh.exe"
 
-# PowerShell 7 pas trouvé => demande à l'utilisateur de l'installer
-if (($PSVersionTable.PSVersion.Major -lt 7) -and (-Not ((Test-Path $powershellPath) -or (Test-Path $powershellPreviewPath)))) {
-	SetTitle "Erreur"
-	Clear-Host
-	Write-Host "PowerShell 7 n'est pas installé sur ce système." -ForegroundColor Red
-	$confirmation = Read-Host -Prompt "Souhaitez-vous installer PowerShell 7 ? (Y/N)"
-
-	if ($confirmation -eq "Y") {
-		# Installation de PowerShell 7
-		SetTitle "PowerShell 7.3.3"
-		Clear-Host
-		Write-Host "Lancement du téléchargement de PowerShell 7.3.3..." -ForegroundColor Green
-
-		$url = "https://github.com/PowerShell/PowerShell/releases/download/v7.3.3/PowerShell-7.3.3-win-x64.msi"
-		$fichierLocal = "$env:TEMP\PowerShell-7.3.3-win-x64.msi"
-
-		$webClient = New-Object System.Net.WebClient
-		$webClient.DownloadFile($url, $fichierLocal)
-
-		if (Test-Path $fichierLocal) {
-			Write-Host "Téléchargement terminé. Lancement de l'installation..." -ForegroundColor Green
-			Start-Process $fichierLocal
-			Write-Host "Une fois l'installation terminée, vous pouvez relancer ce script avec PowerShell 7." -ForegroundColor Green
-			Write-Host "Pour obtenir des instructions supplémentaires, veuillez consulter le tutoriel sur le site $AppNameShort" -ForegroundColor Green
-			EnterToContinue -DefaultPrompt $true
-			Stop-Transcript
-			exit
-		} else {
-			Write-Host "Une erreur est survenue lors du téléchargement." -ForegroundColor Red
-			EnterToContinue -DefaultPrompt $true
-			Stop-Transcript
-			exit
-		}
-	} else {
-		Clear-Host
-		Write-Host "Vous pouvez fermer cette fenêtre en appuyant sur Entrée." -ForegroundColor Yellow -NoNewLine
-		EnterToContinue -DefaultPrompt $true
-		Stop-Transcript
-		exit
+	if (Test-Path $powershellRetailPath) {
+		return $powershellRetailPath
 	}
+	if (Test-Path $powershellPreviewPath) {
+		return $powershellPreviewPath
+	}
+	return $null
 }
 
-# PowerShell 7 est installé, exécute le script avec PowerShell 7 si c'est pas le cas
-if ($args -notcontains "-FromLauncher") {
-	if ($PSVersionTable.PSVersion.Major -lt 7) {
-		Write-Host "Chargement.." -ForegroundColor Yellow
-		$scriptPath = $MyInvocation.MyCommand.Path
-		if ($scriptPath -match "AppData\\Local\\Temp") {
-			$destinationDir = "$PSScriptRoot\SpotiX-Logs\"
-			if (-Not (Test-Path $destinationDir)) {
-				New-Item -Path $destinationDir -ItemType Directory -Force
-			}
-			$newScriptPath = Join-Path $destinationDir (Split-Path -Leaf $scriptPath)
-			Write-Host "Déplacement du script a cette adresse : $newScriptPath" -ForegroundColor Yellow
-			Write-Host "Lancement du script.." -ForegroundColor Yellow
-			Copy-Item -Path $scriptPath -Destination $newScriptPath -Force
-			$scriptPath = $newScriptPath
-		}
+if (($args -notcontains "-FromLauncher") -and ($PSVersionTable.PSVersion.Major -lt 7)) {
+	$powershellPath = GetPowershellPath
 
-		if (Test-Path $powershellPath) {
-			Start-Process $powershellPath -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`" -FromLauncher"
+	if (-not $powershellPath) {
+		SetTitle "Erreur"
+		Clear-Host
+		Write-Host "PowerShell 7 n'est pas installé sur ce système." -ForegroundColor Red
+		$confirmation = Read-Host -Prompt "Souhaitez-vous installer PowerShell 7 ? (Y/N)"
+
+		if ($confirmation -eq "Y") {
+			# Installation de PowerShell 7
+			$response = Invoke-WebRequest "https://api.github.com/repos/PowerShell/PowerShell/releases/latest" | ConvertFrom-Json
+			$powershellLatestVersion = $response.tag_name.Substring(1)
+
+			SetTitle "PowerShell $powershellLatestVersion"
+			Clear-Host
+			Write-Host "Lancement du téléchargement de PowerShell $powershellLatestVersion..." -ForegroundColor Green
+			$url = "https://github.com/PowerShell/PowerShell/releases/download/v$powershellLatestVersion/PowerShell-$powershellLatestVersion-win-x64.msi"
+			$fichierLocal = "$env:TEMP\PowerShell-$powershellLatestVersion-win-x64.msi"
+
+			$webClient = New-Object System.Net.WebClient
+			$webClient.DownloadFile($url, $fichierLocal)
+
+			if (Test-Path $fichierLocal) {
+				Write-Host "Téléchargement terminé. Lancement de l'installation..." -ForegroundColor Green
+				Start-Process $fichierLocal
+				Write-Host "Une fois l'installation terminée, appuyez sur Entrée..." -ForegroundColor Green
+				EnterToContinue
+				$powershellPath = GetPowershellPath
+				if (-not $powershellPath) {
+					Write-Host "Une erreur est survenue lors de l'installation." -ForegroundColor Red
+					EnterToContinue -DefaultPrompt $true
+					Stop-Transcript
+					exit
+				}
+			} else {
+				Write-Host "Une erreur est survenue lors du téléchargement." -ForegroundColor Red
+				EnterToContinue -DefaultPrompt $true
+				Stop-Transcript
+				exit
+			}
 		} else {
-			Start-Process $powershellPreviewPath -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`" -FromLauncher"
+			Clear-Host
+			Write-Host "Vous pouvez fermer cette fenêtre en appuyant sur Entrée." -ForegroundColor Yellow -NoNewLine
+			EnterToContinue -DefaultPrompt $true
+			Stop-Transcript
+			exit
 		}
-		exit
 	}
+
+	Write-Host "Chargement.." -ForegroundColor Yellow
+	$scriptPath = $MyInvocation.MyCommand.Path
+	if ($scriptPath -match "AppData\\Local\\Temp") {
+		$destinationDir = "$PSScriptRoot\SpotiX-Logs\"
+		if (-Not (Test-Path $destinationDir)) {
+			New-Item -Path $destinationDir -ItemType Directory -Force
+		}
+		$newScriptPath = Join-Path $destinationDir (Split-Path -Leaf $scriptPath)
+		Write-Host "Déplacement du script a cette adresse : $newScriptPath" -ForegroundColor Yellow
+		Write-Host "Lancement du script.." -ForegroundColor Yellow
+		Copy-Item -Path $scriptPath -Destination $newScriptPath -Force
+		$scriptPath = $newScriptPath
+	}
+
+	Start-Process $powershellPath -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`" -FromLauncher"
+	exit
 }
 
 # Verification admin ou pas
@@ -199,7 +214,8 @@ function Main {
 		"2. Activer/Désactiver la qualité très élevée",
 		"3. Désinstaller $AppNameShort",
 		"4. Ouvrir la page GitHub",
-		"5. Fermer le script"
+		"5. Rejoindre notre serveur Discord",
+		"6. Fermer le script"
 	) -join "`n`t")
 
 	$userChoices0 = GetUserChoices -validResponses @("1", "2", "3", "4", "5", "6")
@@ -215,8 +231,8 @@ function Main {
 				if ($confirmation1 -eq "N") {
 					Write-Host ((
 						"Quelle version de Spotify souhaitez-vous ?",
-						"1. Nouvelle interface - Compatible avec Windows 11/10         - Plugin externe compatible",
-						"2. Ancienne interface - Compatible avec Windows 11/10/8.1/8/7 - Plugin externe compatible"
+						"1. Nouvelle interface - Compatible avec Windows 11/10     - Plugin externe compatible",
+						"2. Ancienne interface - Compatible avec Windows 11/10/8.1 - Plugin externe compatible"
 					) -join "`n`t")
 					Write-Host "Pour en savoir plus sur les différences entre les versions, consultez la page tutoriel PC du site $AppNameShort (1/2)"
 					$confirmation2 = GetUserChoices -validResponses @("1", "2")
@@ -462,14 +478,40 @@ function Main {
 			}
 			"4" {
 				Write-Host "Ouverture de la page GitHub.."
-				Start-Process $Github
+				Start-Process "https://github.com/$GithubUser/$GithubRepo"
 				Main
 			}
 			"5" {
+				Write-Host "Ouverture de la page GitHub.."
+				Start-Process $Discord
+				Main
+			}
+			"6" {
 				Stop-Transcript
 				exit
 			}
 		}
 	}
 }
+
+function CheckUpdate {
+	$response = Invoke-WebRequest "https://api.github.com/repos/$GithubUser/$GithubRepo/releases/latest" | ConvertFrom-Json
+	$latestVersion = $response.tag_name
+	if ($latestVersion -eq "v$Version") { return }
+
+	PrintLogo
+	Write-Host "Une mise à jour du script à été trouvée"
+	Write-Host "v$Version -> $latestVersion"
+	$confirmation = Read-Host -Prompt "Voulez-vous la télécharger ? (Y/N)"
+	if ($confirmation -eq "N") { return }
+
+	Invoke-WebRequest "https://github.com/AgoyaSpotix/spotixplus-reborn-windows/releases/download/$latestVersion/script.ps1" -OutFile $PSCommandPath
+	Write-Host "Mise à jour téléchargée"
+	Write-Host "Appuyez sur Entrée pour relancer la version mise à jour..."
+	EnterToContinue
+	Start-Process $powershellPath -ArgumentList "-ExecutionPolicy Bypass -File `"$PSCommandPath`" -FromLauncher"
+	exit
+}
+
+CheckUpdate
 Main
