@@ -32,3 +32,5 @@ Vous devriez maintenant être capable de lancer le script !
 Regardez si quelqu'un n'a pas déjà reporté le bug dans l'onglet [Issues](https://github.com/DelofJ/spotixplus-windows/issues).\
 Si c'est le cas, envoyez une réponse en disant que cela vous arrive aussi.\
 Sinon, signalez-le de vous même.
+
+## [Rejoignez le Discord](https://discord.gg/p3AAf7TUPv)
