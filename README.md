@@ -24,7 +24,7 @@ The file <chemin>\script.ps1 is not digitally signed.
 ```
 Ouvrez PowerShell, entrez la commande suivante :
 ```
-Set-ExecutionPolicy -Scope CurrentUser ByPass -Force
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
 ```
 Vous devriez maintenant être capable de lancer le script !
 
