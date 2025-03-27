@@ -68,16 +68,19 @@ function RemoveIfExists {
 SetTitle "Chargement"
 
 # Change de répertoire
-Set-Location $PSScriptRoot
+if ($PSScriptRoot) {
+	Set-Location $PSScriptRoot
+}
 
 # Génére un nom de fichier de log unique basé sur la date et l'heure
 $date = Get-Date -Format "yyyyMMdd_HHmmss"
+$log_dir = "$(Get-Location)\SpotiX-Logs"
 $log_file_name = "logs_$date.txt"
-$log_file_dir = "$PSScriptRoot\SpotiX-Logs\$log_file_name"
+$log_file_dir = "$log_dir\$log_file_name"
 
 # Crée le répertoire nécessaire pour les logs
-if (-not (Test-Path -Path "$PSScriptRoot\SpotiX-Logs")) {
-	New-Item -Path "$PSScriptRoot\SpotiX-Logs\" -ItemType Directory
+if (-not (Test-Path -Path $log_dir)) {
+	New-Item -Path $log_dir -ItemType Directory
 }
 
 # Commencement des logs
@@ -152,11 +155,10 @@ if (($args -notcontains "-FromLauncher") -and ($PSVersionTable.PSVersion.Major -
 	Write-Host "Chargement.." -ForegroundColor Yellow
 	$scriptPath = $MyInvocation.MyCommand.Path
 	if ($scriptPath -match "AppData\\Local\\Temp") {
-		$destinationDir = "$PSScriptRoot\SpotiX-Logs\"
-		if (-Not (Test-Path $destinationDir)) {
-			New-Item -Path $destinationDir -ItemType Directory -Force
+		if (-Not (Test-Path $log_dir)) {
+			New-Item -Path $log_dir -ItemType Directory -Force
 		}
-		$newScriptPath = Join-Path $destinationDir (Split-Path -Leaf $scriptPath)
+		$newScriptPath = Join-Path $log_dir (Split-Path -Leaf $scriptPath)
 		Write-Host "Déplacement du script a cette adresse : $newScriptPath" -ForegroundColor Yellow
 		Write-Host "Lancement du script.." -ForegroundColor Yellow
 		Copy-Item -Path $scriptPath -Destination $newScriptPath -Force
