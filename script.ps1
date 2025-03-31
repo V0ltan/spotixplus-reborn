@@ -298,6 +298,49 @@ function Main {
 					# Arrêt du processus Spotify
 					StopSpotify
 
+					# Modification interface
+					Write-Host "Configuration de $AppNameShort"
+					$url0 = "https://spotixplus.fr/files/windows/script/frdesactived.mo"
+					$fichierLocal0 = "$env:AppData\Spotify\locales\frdesactived.mo"
+					$webClient = New-Object System.Net.WebClient
+					$bufferSize = 8192  # 8KB
+					$startTime = Get-Date
+					$totalBytesReceived = 0
+
+					$responseStream = $webClient.OpenRead($url0)
+					$fileStream = [System.IO.File]::Create($fichierLocal0)
+					$buffer = New-Object byte[] $bufferSize
+					$totalBytes = $webClient.ResponseHeaders["Content-Length"]
+					$bytesReceived = 0
+
+					while (($readBytes = $responseStream.Read($buffer, 0, $bufferSize)) -gt 0) {
+						$fileStream.Write($buffer, 0, $readBytes)
+						$totalBytesReceived += $readBytes
+						$timeElapsed = (Get-Date) - $startTime
+						$speed = $totalBytesReceived / $timeElapsed.TotalSeconds / 1MB
+						$percentComplete = ($totalBytesReceived / $totalBytes) * 100
+						[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
+						Write-Progress -Activity "Téléchargement en cours" -Status "$([math]::Round($percentComplete, 2))% complet" -PercentComplete $percentComplete
+					}
+
+					$responseStream.Close()
+					$fileStream.Close()
+
+					if (Test-Path $fichierLocal0) {
+						$asupp = "$env:AppData\Spotify\locales\fr.mo"
+						Remove-Item -Path $asupp
+						$oldFile1 = "$env:AppData\Spotify\locales\frdesactived.mo"
+						$newFile1 = "$env:AppData\Spotify\locales\fr.mo"
+						Rename-Item -Path $oldFile1 -NewName $newFile1
+					} else {
+						SetTitle "Erreur"
+						Write-Host "Une erreur s'est produite durant le téléchargement des fichiers nécessaires." -ForegroundColor Red
+						Write-Host "Ne retentez pas de lancer le script, cela pourrait générer des conflits" -ForegroundColor Red
+						Write-Host "Merci de contacter le support de $AppNameShort" -ForegroundColor Red
+						EnterToContinue
+						exit
+					}
+
 					# Conditions
 					Write-Host "Configuration de $AppNameShort"
 					$pathconfig = "$env:AppData\Spotify\"
@@ -418,6 +461,56 @@ function Main {
 						$newContent = $content | Where-Object { $_ -notmatch "audio.sync_bitrate=320000" -and $_ -notmatch "audio.play_bitrate=320000" }
 						Set-Content -Path $tmp -Value $newContent
 					}
+				}
+
+				if ($confirmation -eq "1") {
+					$filename = "fractived.mo"
+				} else {
+					$filename = "frdesactived.mo"
+				}
+				
+				# Modification interface
+				$url0 = "https://spotixplus.fr/files/windows/script/$filename"
+				$fichierLocal0 = "$env:AppData\Spotify\locales\$filename"
+				$webClient = New-Object System.Net.WebClient
+				$bufferSize = 8192  # 8KB
+				$startTime = Get-Date
+				$totalBytesReceived = 0
+
+				$responseStream = $webClient.OpenRead($url0)
+				$fileStream = [System.IO.File]::Create($fichierLocal0)
+				$buffer = New-Object byte[] $bufferSize
+				$totalBytes = $webClient.ResponseHeaders["Content-Length"]
+				$bytesReceived = 0
+
+				while (($readBytes = $responseStream.Read($buffer, 0, $bufferSize)) -gt 0) {
+					$fileStream.Write($buffer, 0, $readBytes)
+					$totalBytesReceived += $readBytes
+					$timeElapsed = (Get-Date) - $startTime
+					$speed = $totalBytesReceived / $timeElapsed.TotalSeconds / 1MB
+					$percentComplete = ($totalBytesReceived / $totalBytes) * 100
+					[System.Console]::SetWindowPosition(0,[System.Console]::CursorTop)
+					Write-Progress -Activity "Téléchargement en cours" -Status "$([math]::Round($percentComplete, 2))% complet" -PercentComplete $percentComplete
+				}
+
+				$responseStream.Close()
+				$fileStream.Close()
+
+				if (Test-Path $fichierLocal0) {
+					$asupp = "$env:AppData\Spotify\locales\fr.mo"
+					Remove-Item -Path $asupp
+					$oldFile1 = "$env:AppData\Spotify\locales\$filename"
+					$newFile1 = "$env:AppData\Spotify\locales\fr.mo"
+					Rename-Item -Path $oldFile1 -NewName $newFile1
+				} else {
+					SetTitle "Erreur"
+					Write-Host "Une erreur s'est produite durant le téléchargement des fichiers nécessaires." -ForegroundColor Red
+					Write-Host "Ne retentez pas de lancer le script, cela pourrait générer des conflits" -ForegroundColor Red
+					Write-Host "Merci de contacter le support de $AppNameShort" -ForegroundColor Red
+					EnterToContinue
+					Write-Host "Fermeture de la fenêtre.."
+					Stop-Transcript
+					exit
 				}
 
 				if ($confirmation -eq "1") {
